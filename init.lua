@@ -218,6 +218,25 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 -- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
 -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
 
+-------------
+-- my options
+-------------
+
+-- invoke vim commands nicely
+vim.keymap.set('n', ';', ':')
+
+--switch buffers nicely
+vim.keymap.set('n', '<Tab>', ':bnext<CR>')
+vim.keymap.set('n', '<S-Tab>', ':bprevious<CR>')
+
+-- close buffers nicely
+vim.keymap.set('n', '<Leader>d', ':bp<CR>:bd #<CR>', { desc = '[D]elete buffer' })
+
+-- replace with register is nice
+vim.keymap.set('n', '<Leader>r', '<Plug>ReplaceWithRegisterOperator', { desc = '[R]eplace with register' })
+vim.keymap.set('n', '<Leader>rl', '<Plug>ReplaceWithRegisterLine', { desc = '[R]eplace [L]ine with register' })
+vim.keymap.set('x', '<Leader>r', '<Plug>ReplaceWithRegisterVisual', { desc = '[R]eplace selection with register' })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -256,6 +275,8 @@ rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added via a link or github org/name. To run setup automatically, use `opts = {}`
+  'inkarkat/vim-ReplaceWithRegister',
+
   { 'NMAC427/guess-indent.nvim', opts = {} },
 
   -- Alternatively, use `config = function() ... end` for full control over the configuration.
@@ -696,6 +717,7 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
+        json = { 'jq' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
@@ -900,6 +922,29 @@ require('lazy').setup({
     end,
   },
 
+  {
+    'hat0uma/csvview.nvim',
+    ---@module "csvview"
+    ---@type CsvView.Options
+    opts = {
+      parser = { comments = { '#', '//' } },
+      keymaps = {
+        -- Text objects for selecting fields
+        textobject_field_inner = { 'if', mode = { 'o', 'x' } },
+        textobject_field_outer = { 'af', mode = { 'o', 'x' } },
+        -- Excel-like navigation:
+        -- Use <Tab> and <S-Tab> to move horizontally between fields.
+        -- Use <Enter> and <S-Enter> to move vertically between rows and place the cursor at the end of the field.
+        -- Note: In terminals, you may need to enable CSI-u mode to use <S-Tab> and <S-Enter>.
+        jump_next_field_end = { '<Tab>', mode = { 'n', 'v' } },
+        jump_prev_field_end = { '<S-Tab>', mode = { 'n', 'v' } },
+        jump_next_row = { '<Enter>', mode = { 'n', 'v' } },
+        jump_prev_row = { '<S-Enter>', mode = { 'n', 'v' } },
+      },
+    },
+    cmd = { 'CsvViewEnable', 'CsvViewDisable', 'CsvViewToggle' },
+  },
+
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -910,11 +955,11 @@ require('lazy').setup({
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
   -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
+  require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommended keymaps
+  require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommended keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
